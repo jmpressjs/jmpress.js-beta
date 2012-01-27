@@ -209,6 +209,7 @@ $(function() {
 		});
 		$("head").append( link )
 
+		_gaq.push(['_trackEvent', 'Feature', 'Theme', theme]);
 		event.preventDefault();
 	});
 });
