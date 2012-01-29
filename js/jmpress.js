@@ -23,15 +23,15 @@
 	var engines = {
 		3: {
 			_transform: function( el, data ) {
-				var transform = data.prepend || '';
-				if ( data.rotate && data.rotate.revert ) {
-					transform += data.rotate ? engine._rotate(data.rotate) : '';
-					transform += data.translate ? engine._translate(data.translate) : '';
+				var transform = 'translate(-50%,-50%)';
+				if ( data.revertRotate ) {
+					transform += engine._rotate(data);
+					transform += engine._translate(data);
 				} else {
-					transform += data.translate ? engine._translate(data.translate) : '';
-					transform += data.rotate ? engine._rotate(data.rotate) : '';
+					transform += engine._translate(data);
+					transform += engine._rotate(data);
 				}
-				transform += data.scale ? engine._scale(data.scale) : '';
+				transform += engine._scale(data);
 				css(el, $.extend({}, { transform: transform }, data.css));
 				return true;
 			}
@@ -42,7 +42,7 @@
 			 * @return String CSS for translate3d
 			 */
 			,_translate: function ( t ) {
-				return " translate3d(" + t.x + "px," + t.y + "px," + t.z + "px) ";
+				return t.x || t.y || t.z ? " translate3d(" + Math.round(t.x,4) + "px," + Math.round(t.y,4) + "px," + Math.round(t.z,4) + "px)" : "";
 			}
 			/**
 			 * Rotate
@@ -51,10 +51,10 @@
 			 * @return String CSS for rotate
 			 */
 			,_rotate: function ( r ) {
-				var rX = " rotateX(" + r.x + "deg) ",
-					rY = " rotateY(" + r.y + "deg) ",
-					rZ = " rotateZ(" + r.z + "deg) ";
-				return r.revert ? rZ + rY + rX : rX + rY + rZ;
+				var rX = r.rotateX !== undefined ? " rotateX(" + Math.round(r.rotateX,4) + "deg)" : "",
+					rY = r.rotateY !== undefined ? " rotateY(" + Math.round(r.rotateY,4) + "deg)" : "",
+					rZ = r.rotateZ !== undefined ? " rotateZ(" + Math.round(r.rotateZ,4) + "deg)" : "";
+				return r.revertRotate ? rZ + rY + rX : rX + rY + rZ;
 			}
 			/**
 			 * Scale
@@ -63,20 +63,22 @@
 			 * @return String CSS for scale
 			 */
 			,_scale: function ( s ) {
-				return " scaleX(" + s.x + ") scaleY(" + s.y + ") scaleZ(" + s.z + ") ";
+				return (s.scaleX && s.scaleX != 1 ? " scaleX(" + s.scaleX + ")" : "") +
+					(s.scaleY && s.scaleY != 1 ? " scaleY(" + s.scaleY + ")" : "") +
+					(s.scaleZ && s.scaleZ != 1 ? " scaleZ(" + s.scaleZ + ")" : "");
 			}
 		}
 		,2: {
 			_transform: function( el, data ) {
-				var transform = data.prepend || '';
-				if ( data.rotate && data.rotate.revert ) {
-					transform += data.rotate ? engine._rotate(data.rotate) : '';
-					transform += data.translate ? engine._translate(data.translate) : '';
+				var transform = 'translate(-50%,-50%)';
+				if ( data.revertRotate ) {
+					transform += engine._rotate(data);
+					transform += engine._translate(data);
 				} else {
-					transform += data.translate ? engine._translate(data.translate) : '';
-					transform += data.rotate ? engine._rotate(data.rotate) : '';
+					transform += engine._translate(data);
+					transform += engine._rotate(data);
 				}
-				transform += data.scale ? engine._scale(data.scale) : '';
+				transform += engine._scale(data);
 				css(el, $.extend({}, { transform: transform }, data.css));
 				return true;
 			}
@@ -87,7 +89,7 @@
 			 * @return String CSS for translate3d
 			 */
 			,_translate: function ( t ) {
-				return " translate(" + t.x + "px," + t.y + "px) ";
+				return t.x || t.y ? " translate(" + Math.round(t.x,4) + "px," + Math.round(t.y,4) + "px)" : "";
 			}
 			/**
 			 * Rotate
@@ -96,7 +98,7 @@
 			 * @return String CSS for rotate
 			 */
 			,_rotate: function ( r ) {
-				return " rotate(" + r.z + "deg) ";
+				return r.rotateZ !== undefined ? " rotate(" + r.rotateZ + "deg) " : "";
 			}
 			/**
 			 * Scale
@@ -105,15 +107,16 @@
 			 * @return String CSS for scale
 			 */
 			,_scale: function ( s ) {
-				return " scaleX(" + s.x + ") scaleY(" + s.y + ") ";
+				return (s.scaleX && s.scaleX != 1 ? " scaleX(" + s.scaleX + ")" : "") +
+					(s.scaleY && s.scaleY != 1 ? " scaleY(" + s.scaleY + ")" : "");
 			}
 		}
 		,1: {
 			_transform: function( el, data ) {
-				if ( data.translate ) {
+				if ( data.x || data.y ) {
 					el.animate({
-						top: data.translate.y - ( el.height() / 2 ) + 'px'
-						,left: data.translate.x - ( el.width() / 2 ) + 'px'
+						top: data.y - ( el.height() / 2 ) + 'px'
+						,left: data.x - ( el.width() / 2 ) + 'px'
 					}, 1000); // TODO: Use animation duration
 				}
 				return true;
@@ -175,6 +178,7 @@
 		"WebkitTransform": "-webkit-transform"
 		,"OTransform": "-o-transform"
 		,"MozTransform": "-moz-transform"
+		,"MsTransform": "-ms-transform"
 	}
 
 	/**
@@ -201,6 +205,7 @@
 			,transitionTimingFunction: 'ease-in-out'
 			,transformStyle: "preserve-3d"
 		}
+		,transitionDuration: 1500
 
 		/* CALLBACKS */
 		// TODO documentation
@@ -214,6 +219,7 @@
 		,applyStep: []
 		,unapplyStep: []
 		,setInactive: []
+		,beforeActive: []
 		,setActive: []
 		,selectInitialStep: []
 		,selectPrev: []
@@ -236,6 +242,7 @@
 		,'applyStep': 1
 		,'unapplyStep': 1
 		,'setInactive': 1
+		,'beforeActive': 1
 		,'setActive': 1
 		,'selectInitialStep': 1
 		,'selectPrev': 1
@@ -279,9 +286,9 @@
 				,area: ""
 			}
 			,canvas = null
-			,steps = null
 			,current = null
 			,active = false
+			,activeDelegated = false
 
 
 		/*** MEMBER FUNCTIONS ***/
@@ -302,10 +309,10 @@
 			var callbackData = {
 				data: data
 				,stepData: step
-				,parents: getStepParents( element )
 			}
-			callCallback('beforeInitStep', $(element), callbackData);
-			callCallback('initStep', $(element), callbackData);
+			callCallback.call(this, 'beforeInitStep', $(element), callbackData);
+			step.delegate = data.delegate;
+			callCallback.call(this, 'initStep', $(element), callbackData);
 
 			$(element).data('stepData', step);
 
@@ -313,7 +320,7 @@
 				$(element).attr('id', 'step-' + (idx + 1));
 			}
 
-			callCallback('applyStep', $(element), callbackData);
+			callCallback.call(this, 'applyStep', $(element), callbackData);
 		}
 		/**
 		 * Deinit a single step
@@ -325,8 +332,22 @@
 
 			$(element).attr("style", stepData.oldStyle);
 
-			callCallback('unapplyStep', $(element), {
+			callCallback.call(this, 'unapplyStep', $(element), {
 				stepData: stepData
+			});
+		}
+		/**
+		 * Reapplies stepData to the element
+		 *
+		 * @param element
+		 */
+		function doStepReapply( element ) {
+			callCallback.call(this, 'unapplyStep', $(element), {
+				stepData: element.data("stepData")
+			});
+
+			callCallback.call(this, 'applyStep', $(element), {
+				stepData: element.data("stepData")
 			});
 		}
 		/**
@@ -337,18 +358,15 @@
 			if ( active ) {
 				callCallback.call(this, 'setInactive', active, {
 					stepData: $(active).data('stepData')
-					,parents: getStepParents(active)
 					,reason: "deinit"
 				} );
 			}
 			if(current.jmpressClass) $(jmpress).removeClass(current.jmpressClass);
 
-			callCallback.call(this, 'beforeDeinit', $(this), {
-				steps: steps
-			});
+			callCallback.call(this, 'beforeDeinit', $(this), {});
 
-			steps.each(function( idx ) {
-				doStepDeinit( this );
+			$(settings.stepSelector, jmpress).each(function( idx ) {
+				doStepDeinit.call(jmpress, this );
 			});
 
 			container.attr("style", oldStyle.container);
@@ -363,9 +381,7 @@
 				area.remove();
 			}
 
-			callCallback.call(this, 'afterDeinit', $(this), {
-				steps: steps
-			});
+			callCallback.call(this, 'afterDeinit', $(this), {});
 
 			$(jmpress).data("jmpressmethods", undefined);
 		}
@@ -379,6 +395,9 @@
 			eventData.settings = settings;
 			eventData.current = current;
 			eventData.container = container;
+			eventData.parents = element ? getStepParents(element) : null;
+			eventData.current = current;
+			eventData.jmpress = this;
 			var result = {};
 			$.each( settings[callbackName], function(idx, callback) {
 				result.value = callback.call( jmpress, element, eventData ) || result.value;
@@ -395,13 +414,20 @@
 			if (!active) {
 				return false;
 			}
-			var siblings = $(active).siblings( settings.stepSelector );
+			var siblings = $(active).near( settings.stepSelector )
+				.add( $(active).near( settings.stepSelector, true) )
+				.add( callCallback.call(this, 'selectPrev', active, {
+					stepData: $(active).data('stepData')
+				}))
+				.add( callCallback.call(this, 'selectNext', active, {
+					stepData: $(active).data('stepData')
+				}));
 			siblings.push( active );
 			siblings.each(function() {
 				if ($(this).hasClass( settings.loadedClass )) {
 					return;
 				}
-				callCallback.call(this, 'loadStep', this, {
+				callCallback.call(jmpress, 'loadStep', this, {
 					stepData: $(this).data('stepData')
 				});
 				$(this).addClass( settings.loadedClass );
@@ -461,36 +487,48 @@
 
 			var target = {};
 
-			if ( active ) {
-				callCallback.call(this, 'setInactive', active, {
-					stepData: $(active).data('stepData')
+			var delegated = el;
+			if($(el).data("stepData").delegate) {
+				delegated = $(el).parentsUntil(jmpress).filter(settings.stepSelector).filter(step.delegate) ||
+					$(el).near(step.delegate) ||
+					$(el).near(step.delegate, true) ||
+					$(step.delegate, jmpress);
+				step = delegated.data("stepData");
+			}
+			if ( activeDelegated ) {
+				callCallback.call(this, 'setInactive', activeDelegated, {
+					stepData: $(activeDelegated).data('stepData')
+					,delegatedFrom: active
 					,reason: type
 					,target: target
-					,parents: getStepParents(active)
-					,nextStep: el
+					,nextStep: delegated
 					,nextStepData: step
 				} );
 			}
-			callCallback.call(this, 'setActive', el, {
+			var callbackData = {
 				stepData: step
+				,delegatedFrom: el
 				,reason: type
 				,target: target
-				,parents: getStepParents(el)
-				,prevStep: active
-				,prevStepData: active && $(active).data('stepData')
-			});
+				,prevStep: activeDelegated
+				,prevStepData: activeDelegated && $(activeDelegated).data('stepData')
+			};
+			callCallback.call(this, 'beforeActive', delegated, callbackData);
+			callCallback.call(this, 'setActive', delegated, callbackData);
 
 			// Set on step class on root element
 			if(current.jmpressClass) $(jmpress).removeClass(current.jmpressClass);
-			$(jmpress).addClass(current.jmpressClass = ' step-' + $(el).attr('id') );
+			$(jmpress).addClass(current.jmpressClass = 'step-' + $(delegated).attr('id') );
+			if(current.jmpressDelegatedClass) $(jmpress).removeClass(current.jmpressDelegatedClass);
+			$(jmpress).addClass(current.jmpressDelegatedClass = 'delegating-step-' + $(el).attr('id') );
 
 			var props,
-				zoomin = target.scale.x >= current.scalex;
+				zoomin = target.scaleX >= current.scalex;
 
 			props = {
 				// to keep the perspective look similar for different scales
 				// we need to 'scale' the perspective, too
-				perspective: step.scale.x * 1000 + "px"
+				perspective: step.scaleX * 1000 + "px"
 			};
 			props = $.extend({}, settings.animation, props);
 			if (!zoomin) {
@@ -502,10 +540,11 @@
 			}
 			css(area, props);
 			engine._transform(area, {
-				scale: target.scale
+				scaleX: target.scaleX
+				,scaleY: target.scaleY
+				,scaleZ: target.scaleZ
 			});
 
-			target.rotate.revert = true;
 			props = {
 			};
 			props = $.extend({}, settings.animation, props);
@@ -516,19 +555,21 @@
 				props.transitionDuration = '0';
 				props.transitionDelay = '0';
 			}
-			//css(canvas, props);
-			engine._transform(canvas, {
-				translate: target.translate
-				,rotate: target.rotate
-				,css: props
-			});
+			current.scalex = target.scaleX;
 
-			current.scalex = target.scale.x;
+			target.scaleX = 1;
+			target.scaleY = 1;
+			target.scaleZ = 1;
+			engine._transform(canvas, $.extend({}, {
+				css: props
+			}, target));
+
 			active = el;
+			activeDelegated = delegated;
 
 			loadSiblings.call(this);
 
-			return el;
+			return delegated;
 		}
 		/**
 		 * This should fix ANY kind of buggy scrolling
@@ -566,7 +607,6 @@
 		function next() {
 			return select.call(this, callCallback.call(this, 'selectNext', active, {
 				stepData: $(active).data('stepData')
-				,steps: steps
 			}), "next" );
 		}
 		/**
@@ -577,7 +617,6 @@
 		function prev() {
 			return select.call(this, callCallback.call(this, 'selectPrev', active, {
 				stepData: $(active).data('stepData')
-				,steps: steps
 			}), "prev" );
 		}
 		/**
@@ -588,7 +627,6 @@
 		function home() {
 			return select.call(this, callCallback.call(this, 'selectHome', active, {
 				stepData: $(active).data('stepData')
-				,steps: steps
 			}), "home" );
 		}
 		/**
@@ -599,7 +637,6 @@
 		function end() {
 			return select.call(this,   callCallback.call(this, 'selectEnd', active, {
 				stepData: $(active).data('stepData')
-				,steps: steps
 			}), "end" );
 		}
 		/**
@@ -655,6 +692,7 @@
 			,active: getActive
 			,fire: fire
 			,deinit: deinit
+			,reapply: doStepReapply
 		});
 
 
@@ -671,7 +709,7 @@
 		}
 
 		// grabbing all steps
-		steps = $(settings.stepSelector, jmpress);
+		var steps = $(settings.stepSelector, jmpress);
 
 		// GERNERAL INIT OF FRAME
 		container = jmpress;
@@ -725,21 +763,17 @@
 			scalex: 1
 		};
 
-		callCallback.call(this, 'beforeInit', null, {
-			steps: steps
-		});
+		callCallback.call(this, 'beforeInit', null, {});
 
 		// INITIALIZE EACH STEP
 		steps.each(function( idx ) {
-			doStepInit( this, idx );
+			doStepInit.call(jmpress, this, idx );
 		});
 
-		callCallback.call(this, 'afterInit', null, {
-			steps: steps
-		});
+		callCallback.call(this, 'afterInit', null, {});
 
 		// START
-		select.call(this,  callCallback.call(this, 'selectInitialStep', "init", { steps: steps }) );
+		select.call(this,  callCallback.call(this, 'selectInitialStep', "init", {}) );
 
 		if(settings.initClass)
 			$(steps).removeClass(settings.initClass);
@@ -990,22 +1024,22 @@
 		$.jmpress("initStep", function( step, eventData ) {
 			var data = eventData.data;
 			var stepData = eventData.stepData;
-			stepData.translate = {
-				x: data.x || 0
-				,y: data.y || 0
-				,z: data.z || 0
-			};
-			stepData.rotate = {
-				x: data.rotateX || 0
-				,y: data.rotateY || 0
-				,z: data.rotateZ || data.rotate || 0
-			};
-			stepData.scale = {
-				x: data.scaleX || data.scale || 1
-				,y: data.scaleY || data.scale || 1
-				,z: data.scaleZ || 1
-			};
-			stepData.prepend = 'translate(-50%,-50%)';
+			$.extend(stepData, {
+				x: parseFloat(data.x) || 0
+				,y: parseFloat(data.y) || 0
+				,z: parseFloat(data.z) || 0
+				,r: parseFloat(data.r) || 0
+				,phi: parseFloat(data.phi) || 0
+				,rotate: parseFloat(data.rotate) || 0
+				,rotateX: parseFloat(data.rotateX) || 0
+				,rotateY: parseFloat(data.rotateY) || 0
+				,rotateZ: parseFloat(data.rotateZ) || 0
+				,revertRotate: false
+				,scale: parseFloat(data.scale) || 1
+				,scaleX: parseFloat(data.scaleX) || false
+				,scaleY: parseFloat(data.scaleY) || false
+				,scaleZ: parseFloat(data.scaleZ) || 1
+			});
 		});
 		$.jmpress("applyStep", function( step, eventData ) {
 			$.jmpress("css", $(step), {
@@ -1017,60 +1051,70 @@
 					top: "50%"
 					,left: "50%"
 				});
-			$.jmpress("engine")._transform( $(step), eventData.stepData );
-		});
-		$.jmpress("setInactive", function( step, eventData ) {
-			if(eventData.settings.nestedActiveClass)
-				$.each(eventData.parents, function(idx, element) {
-					$(element).removeClass(eventData.settings.nestedActiveClass);
-				});
+			var transform = $.extend({}, eventData.stepData);
+			transform.rotateZ = transform.rotateZ || transform.rotate;
+			transform.scaleX = transform.scaleX || transform.scale;
+			transform.scaleY = transform.scaleY || transform.scale;
+			transform.x = transform.x || (transform.r * Math.sin(transform.phi*Math.PI/180));
+			transform.y = transform.y || (-transform.r * Math.cos(transform.phi*Math.PI/180));
+			$.jmpress("engine")._transform( $(step), transform );
 		});
 		$.jmpress("setActive", function( step, eventData ) {
 			var target = eventData.target;
 			var step = eventData.stepData;
-			target.rotate = {
-				x: -parseInt(step.rotate.x, 10)
-				,y: -parseInt(step.rotate.y, 10)
-				,z: -parseInt(step.rotate.z, 10)
-				,revert: false
-			};
-			target.scale = {
-				x: 1 / parseFloat(step.scale.x)
-				,y: 1 / parseFloat(step.scale.y)
-				,z: 1 / parseFloat(step.scale.z)
-			};
-			target.translate = {
-				x: -step.translate.x
-				,y: -step.translate.y
-				,z: -step.translate.z
-			};
+			$.extend(target, {
+				rotateX: -step.rotateX
+				,rotateY: -step.rotateY
+				,rotateZ: -(step.rotateZ || step.rotate)
+				,revertRotate: true
+				,scaleX: 1 / (step.scaleX || step.scale)
+				,scaleY: 1 / (step.scaleY || step.scale)
+				,scaleZ: 1 / (step.scaleZ)
+				,x: -(step.x || (step.r * Math.sin(step.phi*Math.PI/180)))
+				,y: -(step.y || (-step.r * Math.cos(step.phi*Math.PI/180)))
+				,z: -step.z
+			});
 			$.each(eventData.parents, function(idx, element) {
-				$(element).addClass(eventData.settings.nestedActiveClass);
 				var stepD = $(element).data("stepData");
 				var inverseScale = {
-					x: 1 / parseFloat(stepD.scale.x)
-					,y: 1 / parseFloat(stepD.scale.y)
-					,z: 1 / parseFloat(stepD.scale.z)
+					x: 1 / (stepD.scaleX || stepD.scale)
+					,y: 1 / (stepD.scaleY || stepD.scale)
+					,z: 1 / (stepD.scaleZ)
 				}
-				target.translate.x /= inverseScale.x;
-				target.translate.y /= inverseScale.y;
-				target.translate.z /= inverseScale.z;
+				target.x /= inverseScale.x;
+				target.y /= inverseScale.y;
+				target.z /= inverseScale.z;
 				// TODO: implement complete matrix transformation
 				// for now only rotateZ applies correctly from parent to childs
-				var ty = -target.translate.x * Math.sin(-parseInt(stepD.rotate.z, 10)/180*Math.PI) + target.translate.y * Math.cos(-stepD.rotate.z/180*Math.PI);
-				var tx = target.translate.x * Math.cos(-parseInt(stepD.rotate.z, 10)/180*Math.PI) + target.translate.y * Math.sin(-stepD.rotate.z/180*Math.PI);
-				target.translate.x = tx;
-				target.translate.y = ty;
-				target.rotate.x -= parseInt(stepD.rotate.x, 10);
-				target.rotate.y -= parseInt(stepD.rotate.y, 10);
-				target.rotate.z -= parseInt(stepD.rotate.z, 10);
-				target.translate.x -= stepD.translate.x;
-				target.translate.y -= stepD.translate.y;
-				target.translate.z -= stepD.translate.z;
-				target.scale.x *= inverseScale.x;
-				target.scale.y *= inverseScale.y;
-				target.scale.z *= inverseScale.z;
+				var ty = -target.x * Math.sin(-(stepD.rotateZ || stepD.rotate)/180*Math.PI) + target.y * Math.cos(-(stepD.rotateZ || stepD.rotate)/180*Math.PI);
+				var tx = target.x * Math.cos(-(stepD.rotateZ || stepD.rotate)/180*Math.PI) + target.y * Math.sin(-(stepD.rotateZ || stepD.rotate)/180*Math.PI);
+				target.x = tx;
+				target.y = ty;
+				target.rotateX -= (stepD.rotateX);
+				target.rotateY -= (stepD.rotateY);
+				target.rotateZ -= (stepD.rotateZ || stepD.rotate);
+				target.x -= stepD.x || (stepD.r * Math.sin(stepD.phi*Math.PI/180));
+				target.y -= stepD.y || (-stepD.r * Math.cos(stepD.phi*Math.PI/180));
+				target.z -= stepD.z;
+				target.scaleX *= inverseScale.x;
+				target.scaleY *= inverseScale.y;
+				target.scaleZ *= inverseScale.z;
 			});
+			function lowRotate(name) {
+				if(eventData.current[name] === undefined)
+					eventData.current[name] = target[name];
+				var cur = eventData.current[name], tar = target[name],
+					curmod = cur % 360, tarmod = tar % 360;
+				if(curmod < 0) curmod += 360;
+				if(tarmod < 0) tarmod += 360;
+				var diff = tarmod - curmod;
+				if(diff < -180) diff += 360;
+				else if(diff > 180) diff -= 360;
+				eventData.current[name] = target[name] = cur + diff;
+			}
+			lowRotate("rotateX");
+			lowRotate("rotateY");
+			lowRotate("rotateZ");
 		});
 	})();
 
@@ -1079,45 +1123,64 @@
 		$.jmpress( 'setInactive', function( step, eventData ) {
 			if(eventData.settings.activeClass)
 				$(step).removeClass( eventData.settings.activeClass );
+			if(eventData.settings.nestedActiveClass)
+				$.each(eventData.parents, function(idx, element) {
+					$(element).removeClass(eventData.settings.nestedActiveClass);
+				});
 		});
 		$.jmpress( 'setActive', function( step, eventData ) {
 			if(eventData.settings.activeClass)
 				$(step).addClass( eventData.settings.activeClass );
+			if(eventData.settings.nestedActiveClass)
+				$.each(eventData.parents, function(idx, element) {
+					$(element).addClass(eventData.settings.nestedActiveClass);
+				});
 		});
 	})();
 
 	(function() { // circular stepping
+		$.jmpress( 'initStep', function( step, eventData ) {
+			eventData.stepData.exclude = eventData.data.exclude && ["false", "no"].indexOf(eventData.data.exclude) == -1;
+		});
 		function firstSlide( step, eventData ) {
-			return eventData.steps[0];
+			return $(this).find(eventData.settings.stepSelector).first();
 		}
 		$.jmpress( 'selectInitialStep', firstSlide);
 		$.jmpress( 'selectHome', firstSlide);
 		$.jmpress( 'selectEnd', function( step, eventData ) {
-			return eventData.steps[eventData.steps.length - 1];
+			return $(this).find(eventData.settings.stepSelector).last();
 		});
 		$.jmpress( 'selectPrev', function( step, eventData ) {
 			if (!step) {
 				return false;
 			}
-			var prev = $(step).near( eventData.settings.stepSelector, true );
-			if (prev.length == 0 || $(prev).closest(this).length == 0) {
-				prev = eventData.steps.last( eventData.settings.stepSelector );
-			}
-			if (prev.length > 0) {
-				return prev;
-			}
+			do {
+				var prev = $(step).near( eventData.settings.stepSelector, true );
+				if (prev.length == 0 || $(prev).closest(this).length == 0) {
+					prev = $(this).find(eventData.settings.stepSelector).last();
+				}
+				if (!prev.length) {
+					return false;
+				}
+				step = prev;
+			} while( step.data("stepData").exclude );
+			return step;
 		});
 		$.jmpress( 'selectNext', function( step, eventData ) {
 			if (!step) {
 				return false;
 			}
-			var next = $(step).near( eventData.settings.stepSelector );
-			if (next.length == 0 || $(next).closest(this).length == 0) {
-				next = eventData.steps.first( eventData.settings.stepSelector );
-			}
-			if (next.length > 0) {
-				return next;
-			}
+			do {
+				var next = $(step).near( eventData.settings.stepSelector );
+				if (next.length == 0 || $(next).closest(this).length == 0) {
+					next = $(this).find(eventData.settings.stepSelector).first();
+				}
+				if (!next.length) {
+					return false;
+				}
+				step = next;
+			} while( step.data("stepData").exclude );
+			return step;
 		});
 	})();
 
@@ -1151,15 +1214,15 @@
 			if(eventData.stepData.next) {
 				var near = $(step).near(eventData.stepData.next);
 				if(near && near.length) return near;
-				near = $(eventData.stepData.nextStep, this);
+				near = $(eventData.stepData.next, this).first();
 				if(near && near.length) return near;
 			}
 		});
 		$.jmpress( 'selectPrev', function( step, eventData ) {
-			if(eventData.stepData.prevStep) {
-				var near = $(step).near(eventData.stepData.prevStep, true);
+			if(eventData.stepData.prev) {
+				var near = $(step).near(eventData.stepData.prev, true);
 				if(near && near.length) return near;
-				near = $(eventData.stepData.prevStep, this).last();
+				near = $(eventData.stepData.prev, this).last();
 				if(near && near.length) return near;
 			}
 		});
@@ -1168,13 +1231,13 @@
 	(function() { // load steps from ajax
 		$.jmpress('register', 'afterStepLoaded');
 		$.jmpress('initStep', function( step, eventData ) {
-			eventData.stepData.ajaxSource = $(step).attr('href') || eventData.data['src'] || false;
+			eventData.stepData.src = $(step).attr('href') || eventData.data['src'] || false;
 		});
 		$.jmpress('loadStep', function( step, eventData ) {
-			var href = eventData.stepData.ajaxSource;
+			var href = eventData.stepData.src;
 			if ( href ) {
 				$(step).load(href, function(response, status, xhr) {
-					$.jmpress('fire', 'afterStepLoaded', step, $.extend({}, eventData, {
+					$(eventData.jmpress).jmpress('fire', 'afterStepLoaded', step, $.extend({}, eventData, {
 						response: response
 						,status: status
 						,xhr: xhr
@@ -1227,6 +1290,7 @@
 						if($(href).is(eventData.settings.stepSelector)) {
 							$(jmpress).jmpress("select", href);
 							event.preventDefault();
+							event.stopPropagation();
 						}
 					} catch(e) {}
 				});
@@ -1244,8 +1308,8 @@
 			if ( eventData.settings.hash.use && eventData.settings.hash.update ) {
 				clearTimeout(eventData.current.hashtimeout);
 				eventData.current.hashtimeout = setTimeout(function() {
-					window.location.hash = "#/" + $(step).attr('id');
-				}, 2000); // TODO: Use animation duration
+					window.location.hash = "#/" + $(eventData.delegatedFrom).attr('id');
+				}, eventData.settings.transitionDuration + 200);
 			}
 		});
 	})();
@@ -1335,6 +1399,7 @@
 						nextFocus.focus();
 						$(jmpress).jmpress("scrollFix");
 						event.preventDefault();
+						event.stopPropagation();
 						return;
 					} else {
 						if(event.shiftKey)
@@ -1397,9 +1462,9 @@
 			if(windowScale) {
 				if(viewPort.maxScale) windowScale = Math.min(windowScale, viewPort.maxScale);
 				if(viewPort.minScale) windowScale = Math.max(windowScale, viewPort.minScale);
-				eventData.target.scale.x *= windowScale;
-				eventData.target.scale.y *= windowScale;
-				eventData.target.scale.z *= windowScale;
+				eventData.target.scaleX *= windowScale;
+				eventData.target.scaleY *= windowScale;
+				eventData.target.scaleZ *= windowScale;
 			}
 		});
 	})();
@@ -1427,6 +1492,7 @@
 					// select the clicked step
 					$(this).jmpress("select", clickedStep[0], "click");
 					event.preventDefault();
+					event.stopPropagation();
 				}
 			});
 		});
@@ -1437,15 +1503,16 @@
 
 	(function() { // templates
 		var templates = {};
-		function addUndefined( target, values ) {
+		function addUndefined( target, values, prefix ) {
 			for( var name in values ) {
-				if( target[name] == undefined ) {
-					target[name] = values[name];
-				} else if( $.isPlainObject(target[name]) ) {
-					if( !$.isPlainObject(values[name]) )
-						$.error(name + "should be a object too");
-					else
-						addUndefined( target[name], values[name] );
+				var targetName = name;
+				if(prefix) {
+					targetName = prefix + targetName.substr(0, 1).toUpperCase() + targetName.substr(1);
+				}
+				if( $.isPlainObject(values[name]) ) {
+					addUndefined( target, values[name], targetName );
+				} else if( target[targetName] == undefined ) {
+					target[targetName] = values[name];
 				}
 			}
 		}
@@ -1486,13 +1553,17 @@
 			if(templateFromParent) {
 				applyTemplate( eventData.data, step, templateFromParent );
 				step.data("_template_", null);
+				if(templateFromParent.template) {
+					var template = templates[templateFromParent.template]
+					applyTemplate( eventData.data, step, template );
+				}
 			}
 		});
 		$.jmpress("beforeInit", function( nil, eventData ) {
 			var data = $.jmpress("dataset", this);
 			if(data.template) {
 				var template = templates[data.template];
-				applyChildrenTemplates( $(eventData.steps).filter(function() {
+				applyChildrenTemplates( $(this).find(eventData.settings.stepSelector).filter(function() {
 					return !$(this).parent().is(eventData.settings.stepSelector);
 				}), template.children );
 			}
@@ -1505,6 +1576,7 @@
 		});
 		$.jmpress("register", "apply", function( selector, tmpl ) {
 			if( !tmpl ) {
+				// TODO ERROR because settings not found
 				var stepSelector = $(jmpress).jmpress("settings").stepSelector
 				applyChildrenTemplates( $(this).find(stepSelector).filter(function() {
 					return !$(this).parent().is(stepSelector);

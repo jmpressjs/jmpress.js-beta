@@ -17,6 +17,7 @@
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jmpress.js"></script>
 	<script type="text/javascript" src="plugins/duration.js"></script>
+	<script type="text/javascript" src="plugins/secondary.js"></script>
 </head>
 <body>
 
@@ -24,19 +25,31 @@
 	<li><a href="#home"><span>HOME</span></a></li>
 	<li><a href="#about"><span>ABOUT</span></a></li>
 	<li><a href="#download"><span>DOWNLOAD</span></a></li>
-	<li><a href="#docs"><span>DOCS</span></a></li>
+	<li><a href="#docs"><span>DOCS</span></a>
+		<ul>
+			<li><a href="#docs-start"><span>Start</span></a></li>
+			<li><a href="#docs-options"><span>Options</span></a></li>
+			<li><a href="#docs-inline"><span>Inline</span></a></li>
+			<li><a href="#docs-templates"><span>Templates</span></a></li>
+			<li><a href="#docs-route"><span>Routes</span></a></li>
+			<li><a href="#docs-plugins"><span>Plugins</span></a></li>
+			<li><a href="#docs-callbacks"><span>Callbacks</span></a></li>
+			<li><a href="#docs-methods"><span>Methods</span></a></li>
+		</ul>
+	</li>
 	<li><a href="#contribute"><span>CONTRIBUTE</span></a></li>
-	<li><a href="#showcase"><span>SHOWCASE</span></a></li>
-</ul>
-<ul id="nav-themes">
-	<li><h3>jQuery ui themes&nbsp;</h3></li>
-	<li><a href="#" data-theme="start"><span>start</span></a></li>
-	<li><a href="#" data-theme="sunny"><span>sunny</span></a></li>
-	<li><a href="#" data-theme="base"><span>base</span></a></li>
-	<li><a href="#" data-theme="le-frog"><span>le-frog</span></a></li>
-	<li><a href="#" data-theme="black-tie"><span>black-tie</span></a></li>
-	<li><a href="#" data-theme="ui-darkness"><span>ui-darkness</span></a></li>
-	<li><a href="#" data-theme="ui-lightness"><span>ui-lightness</span></a></li>
+	<li><a href="#showcase"><span>SHOWCASE</span></a>
+		<ul>
+			<li><b>THEMES</b></li>
+			<li><a href="#" data-theme="start"><span>start</span></a></li>
+			<li><a href="#" data-theme="sunny"><span>sunny</span></a></li>
+			<li><a href="#" data-theme="base"><span>base</span></a></li>
+			<li><a href="#" data-theme="le-frog"><span>le-frog</span></a></li>
+			<li><a href="#" data-theme="black-tie"><span>black-tie</span></a></li>
+			<li><a href="#" data-theme="ui-darkness"><span>ui-darkness</span></a></li>
+			<li><a href="#" data-theme="ui-lightness"><span>ui-lightness</span></a></li>
+		</ul>
+	</li>
 </ul>
 
 <div id="jmpress" class="init-css" data-template="main">
@@ -107,8 +120,34 @@
 	<div id="docs" class="step">
 		<h1>docs</h1>
 		<p>Available <a href="https://github.com/shama/jmpress.js">in the readme</a> for now</p>
+		<p>Read it <a href="#docs-start">&lt; over there</a></p>
 		<span class="ui-icon ui-icon-document"></span>
 		<a href="#" class="next">next &gt;</a>
+		
+		<div id="docs-start" data-src="docs/start.html" class="step docs" data-x="-1000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-options" data-src="docs/options.html" class="step docs" data-x="-2000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-inline" data-src="docs/inline.html" class="step docs" data-x="-3000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-templates" data-src="docs/templates.html" class="step docs" data-x="-4000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-route" data-src="docs/route.html" class="step docs" data-x="-5000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-plugins" data-src="docs/plugins.html" class="step docs" data-x="-6000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-callbacks" data-src="docs/callbacks.html" class="step docs" data-x="-7000" data-rotate="180">
+			Loading...
+		</div>
+		<div id="docs-methods" data-src="docs/methods.html" class="step docs" data-x="-8000" data-rotate="180">
+			Loading...
+		</div>
 	</div>
 
 	<!--
@@ -163,6 +202,7 @@
 		<a href="#" class="next">next &gt;</a>
 		<div id="showcase-nested" class="step">
 			<h1>nested step</h1>
+			<p style="font-size: 70%">it has secondary rotation, which is applied on enter (secondary-plugin).</p>
 			<p>with a nested jmpress. (click it to navigate there)</p>
 			<div id="nested-jmpress" style="height: 100px; width: 700px;">
 				<div class="nested-step" data-duration="-1">
@@ -181,14 +221,14 @@
 				</div>
 				<div class="nested-step" data-y="1000" data-x="1000" data-rotate-x="90">
 					<h2>Combine this with duration-plugin</h2>
-					<h2>TODO: add more points</h2>
+					<p>As here</p>
 				</div>
 				<div class="ui-progressbar ui-widget ui-widget-content ui-corner-all" style="position: absolute; left: 5px; right: 5px; bottom: 5px; height: 10px">
-					<div id="nested-jmpress-bar" class="ui-progressbar-value ui-widget-header ui-corner-left"></div>
+					<div id="nested-jmpress-bar" class="ui-progressbar-value ui-widget-header ui-corner-left" style="width:0"></div>
 				</div>
 			</div>
 			<p style="font-size: 70%">NOTICE: the nested jmpress presentation uses 3d much more the the outer presentation.
-			Browser support may be more limited. (progress bar in Firefox + IE currently buggy)</p>
+			Browser support may be more limited.</p>
 			<a href="#" class="next">home</a>
 		</div>
 	</div>
@@ -202,17 +242,21 @@
 $(function() {
 	var pageviewTimeout;
 
-	// data-x="2700" data-y="-3700" data-rotate="-230" data-scale="2.8"
-	// data-x="250" data-y="-30" data-rotate-z="20" data-scale="0.3"
 	$.jmpress("apply", "#showcase-nested", {
 		x: 250
 		,y: -30
-		,rotateZ: 20
+		,rotate: { z: 20 }
+		,secondary: {
+			rotateZ: 90
+			,y: 30
+			,"": "siblings"
+		}
 		,scale: 0.3
 	});
 	$.jmpress("template", "main", { children: [
 		{
 			scale: 10
+			,z: 1
 		},
 		{
 			x: -800
@@ -269,7 +313,8 @@ $(function() {
 			,scale: 2.8
 		},
 	]});
-	// $('#jmpress').jmpress("route", ["#about-impress", "#docs", "#download", "#contribute"]);
+	$('#jmpress').jmpress("route", ["#showcase-nested", "#about"]);
+	$('#jmpress').jmpress("route", ["#docs", "#contribute"]);
 	var jmpressConfig = {
 		// SET THE VIEW PORT
 		viewPort: {
