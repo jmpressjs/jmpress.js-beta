@@ -422,16 +422,28 @@
 				.add( callCallback.call(this, 'selectNext', active, {
 					stepData: $(active).data('stepData')
 				}));
-			siblings.push( active );
 			siblings.each(function() {
-				if ($(this).hasClass( settings.loadedClass )) {
+				var step = this;
+				if ($(step).hasClass( settings.loadedClass )) {
 					return;
 				}
-				callCallback.call(jmpress, 'loadStep', this, {
-					stepData: $(this).data('stepData')
-				});
-				$(this).addClass( settings.loadedClass );
+				setTimeout(function() {
+					if ($(step).hasClass( settings.loadedClass )) {
+						return;
+					}
+					callCallback.call(jmpress, 'loadStep', step, {
+						stepData: $(step).data('stepData')
+					});
+					$(step).addClass( settings.loadedClass );
+				}, settings.transitionDuration - 100);
 			});
+			if ($(active).hasClass( settings.loadedClass )) {
+				return;
+			}
+			callCallback.call(jmpress, 'loadStep', active, {
+				stepData: $(active).data('stepData')
+			});
+			$(active).addClass( settings.loadedClass );
 		}
 		/**
 		 *
@@ -646,8 +658,8 @@
 		 * @return Object canvas
 		 */
 		function canvasMod( props ) {
-			css(canvas, props);
-			return canvas;
+			css(canvas, props || {});
+			return $(canvas);
 		}
 		/**
 		 * Return current settings
@@ -663,7 +675,7 @@
 		 * @return Object
 		 */
 		function getActive() {
-			return active && $(active);
+			return activeDelegated && $(activeDelegated);
 		}
 		/**
 		 * fire a callback
@@ -1084,11 +1096,29 @@
 				target.y /= inverseScale.y;
 				target.z /= inverseScale.z;
 				// TODO: implement complete matrix transformation
-				// for now only rotateZ applies correctly from parent to childs
-				var ty = -target.x * Math.sin(-(stepD.rotateZ || stepD.rotate)/180*Math.PI) + target.y * Math.cos(-(stepD.rotateZ || stepD.rotate)/180*Math.PI);
-				var tx = target.x * Math.cos(-(stepD.rotateZ || stepD.rotate)/180*Math.PI) + target.y * Math.sin(-(stepD.rotateZ || stepD.rotate)/180*Math.PI);
-				target.x = tx;
-				target.y = ty;
+				var rZ = -(stepD.rotateZ || stepD.rotate)/180*Math.PI
+					,sinZ = Math.sin(rZ), cosZ = Math.cos(rZ);
+				var rY = -(stepD.rotateY)/180*Math.PI
+					,sinY = Math.sin(rY), cosY = Math.cos(rY);
+				var rX = -(stepD.rotateX)/180*Math.PI
+					,sinX = Math.sin(rX), cosX = Math.cos(rX);
+				var tx, ty, tz;
+				// apply rZ
+				ty = -target.x * sinZ + target.y * cosZ;
+				tx = target.x * cosZ + target.y * sinZ;
+				tz = target.z;
+				target.x = tx; target.y = ty; target.z = tz;
+				// apply rY
+				ty = target.y;
+				tx = target.x * cosY + target.z * sinY;
+				tz = target.x * sinY + target.z * cosY;
+				target.x = tx; target.y = ty; target.z = tz;
+				// apply rX
+				ty = target.y * cosX + target.z * sinX;
+				tx = target.x;
+				tz = - target.y * sinX + target.z * cosX;
+				target.x = tx; target.y = ty; target.z = tz;
+
 				target.rotateX -= (stepD.rotateX);
 				target.rotateY -= (stepD.rotateY);
 				target.rotateZ -= (stepD.rotateZ || stepD.rotate);
@@ -1265,8 +1295,10 @@
 				// get id from url # by removing `#` or `#/` from the beginning,
 				// so both "fallback" `#slide-id` and "enhanced" `#/slide-id` will work
 				// TODO SECURITY check user input to be valid!
-				var el = $( '#' + window.location.hash.replace(/^#\/?/,"") );
-				return el.length > 0 && el.is(eventData.settings.stepSelector) ? el : undefined;
+				try {
+					var el = $( '#' + window.location.hash.replace(/^#\/?/,"") );
+					return el.length > 0 && el.is(eventData.settings.stepSelector) ? el : undefined;
+				} catch(e) {}
 			}
 			eventData.current.hashNamespace = ".jmpress-"+randomString();
 			// HASH CHANGE EVENT
