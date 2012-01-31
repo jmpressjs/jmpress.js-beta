@@ -119,8 +119,7 @@
 
 	<div id="docs" class="step">
 		<h1>docs</h1>
-		<p>Available <a href="https://github.com/shama/jmpress.js">in the readme</a> for now</p>
-		<p>Read it <a href="#docs-start">&lt; over there</a></p>
+		<p>Read them <a href="#docs-start">&lt; over there ;)</a></p>
 		<span class="ui-icon ui-icon-document"></span>
 		<a href="#" class="next">next &gt;</a>
 		
@@ -149,16 +148,6 @@
 			Loading...
 		</div>
 	</div>
-
-	<!--
-	<div id="docs-basic" data-src="docs/basic.html" class="step docs" data-x="2800" data-y="1400" data-rotate="-130" data-scale="2">
-		Loading...
-	</div>
-
-	<div id="docs-api" data-src="docs/api.html" class="step docs" data-x="3900" data-y="2500" data-rotate="-140" data-scale="2">
-		Loading...
-	</div>
-	-->
 
 	<div id="contribute" class="step">
 		<h1>contribute</h1>
@@ -193,7 +182,7 @@
 		<ul>
 			<li>embed this in a container <a href="container.html">Show Sample</a></li>
 			<li>jquery ui themes</li>
-			<li>Switch to normal view: <a href="#" id="uninit-jmpress">Switch</a> <a href="#" id="reinit-jmpress">Switch back :)</a></li>
+			<li>Switch to normal view: <a href="#" id="uninit-jmpress">Switch</a> <a href="#" id="reinit-jmpress">Switch back to presentation view :)</a></li>
 			<li>nice plugin interface <br>(most of the core functionality is built on this interface)</li>
 			<li>many config options</li>
 			<li>tree-like hierarchies are possible</li>
@@ -337,12 +326,21 @@ $(function() {
 		}
 		// SET THE ACTIVE SLIDE IN THE NAV
 		,setActive: function( slide ) {
+			$('#nav a')
+				.removeClass( 'ui-state-active' )
+				.parent( 'li' )
+					.removeClass( 'active' );
 			var id = $(slide).attr('id');
-			if (id.indexOf('-') != -1) {
-				id = id.substr(0, id.indexOf('-'));
+			var idArr = id.split("-");
+			id = "";
+			for(var i = 0; i < idArr.length; i ++) {
+				if(id) id += "-";
+				id += idArr[i];
+				$('#nav a[href=\"#' + id + '\"]')
+					.addClass( 'ui-state-active' )
+					.parent( 'li' )
+						.addClass( 'active' );
 			}
-			$('#nav a').removeClass( 'ui-state-active' );
-			$('#nav a[href=#' + id + ']').addClass( 'ui-state-active' );
 
 			// Track each step as page
 			if(pageviewTimeout) clearTimeout(pageviewTimeout);
@@ -361,6 +359,7 @@ $(function() {
 		,areaClass: ""
 		,canvasClass: ""
 		,initClass: "init-css"
+		,animation: { transitionDelay: "0ms" }
 	};
 	$('#jmpress').jmpress(jmpressConfig);
 	$('.next').click(function() {
