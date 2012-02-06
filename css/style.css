@@ -38,6 +38,7 @@ footer, header, hgroup, menu, nav, section {
 body {
 	line-height: 1;
 	font-weight: bold;
+	pointer-events: none;
 }
 ol, ul {
 	list-style: none;
@@ -74,6 +75,7 @@ a {
 	-ms-transition:     0.5s;
 	-o-transition:      0.5s;
 	transition:         0.5s;
+	pointer-events: 	auto;
 }
 h1, h1 a {
 	font-size: 68px;
@@ -81,6 +83,10 @@ h1, h1 a {
 	margin-bottom: 10px;
 
 	text-shadow: #333 -2px 2px 3px;
+}
+.big h1 {
+	font-size: 216px;
+	margin-bottom: 100px;
 }
 h2 {
 	font-size: 42px;
@@ -105,7 +111,14 @@ h4 {
 	position: fixed;
 	left: -5px;
 	top: 10px;
-	z-index: 99;
+	z-index: 9999;
+	pointer-events: auto;
+
+	-webkit-transform: translate3d(0,0,100000px);
+	-moz-transform:    translate3d(0,0,100000px);
+	-ms-transform:     translate3d(0,0,100000px);
+	-o-transform:      translate3d(0,0,100000px);
+	transform:         translate3d(0,0,100000px);
 }
 #nav li {
 	list-style: none;
@@ -177,8 +190,37 @@ h4 {
 
 .next {
 	float: right;
+}
+.prev {
+	float: left;
+}
+.next, .prev {
 	margin-top: 50px;
 	font-size: 22px;
+}
+
+#global-next, #global-prev {
+	position: fixed;
+	bottom: 5px;
+	width: 20%;
+	padding: 0.2em;
+	margin-left: 5px;
+	margin-right: 5px;
+	z-index: 9999;
+	text-align: center;
+	pointer-events: auto;
+
+	-webkit-transform: translate3d(0,0,100000px);
+	-moz-transform:    translate3d(0,0,100000px);
+	-ms-transform:     translate3d(0,0,100000px);
+	-o-transform:      translate3d(0,0,100000px);
+	transform:         translate3d(0,0,100000px);
+}
+#global-next {
+	left: 50%;
+}
+#global-prev {
+	right: 50%;
 }
 
 /** COMMON STEP STYLES **/
@@ -198,6 +240,8 @@ h4 {
 
 	font-size: 26px;
 	line-height: 1.5;
+
+	pointer-events: auto;
 }
 
 /* fade out inactive slides */
@@ -207,6 +251,14 @@ h4 {
 	-ms-transition:     1s;
 	-o-transition:      1s;
 	transition:         1s;
+}
+
+.big.step {
+	width: 4000px;
+	min-height: 50px;
+	padding: 200px;
+
+	font-size: 148px;
 }
 
 .step:not(.active):not(.nested-active) {
@@ -357,23 +409,16 @@ h4 {
 	font-size: 1em;
 }
 
-/* hint on the first slide */
-
+/* keyboard hint on the first step */
 .hint {
 	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0px;
-
-	background: rgba(255,204,0,1);
-	color: #000;
-	text-align: right;
-
-	font-size: 22px;
+	left: 50%;
+	bottom: 40px;
+	text-align: center;
+	font-size: 16px;
 	padding: 10px;
-
-	z-index: 100;
-
+	margin-left: -150px;
+	z-index: 10000;
 	opacity: 0;
 
 	-webkit-transform: translateY(400px);
@@ -481,8 +526,13 @@ h4 {
 	left: 0px;
 }
 
-/** PRINT STYLE **/
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px) {
+	#nav { display: none; }
+	.hint { display: none; }
+}
 
+/** PRINT STYLE **/
 @media print {
 	body, .ui-state-default {
 		background: white;
