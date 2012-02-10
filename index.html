@@ -14,10 +14,11 @@
 	<meta property="og:image" content="http://dontkry.com/img/jmpress/jmpress.png" />
 
 	<link id="theme" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/start/jquery-ui.css" rel="stylesheet" />
-	<link href="css/style.css" rel="stylesheet" type="text/css" />
+	<link href="src/css/style.css" rel="stylesheet" type="text/css" />
+	<link href="dist/basic-animations.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="js/jmpress.demo.js"></script>
+	<script type="text/javascript" src="dist/jmpress.demo.js"></script>
 </head>
 <body>
 
@@ -25,18 +26,7 @@
 	<li><a href="#home"><span>HOME</span></a></li>
 	<li><a href="#about"><span>ABOUT</span></a></li>
 	<li><a href="#download"><span>DOWNLOAD</span></a></li>
-	<li><a href="#docs"><span>DOCS</span></a>
-		<ul>
-			<li><a href="#docs-start"><span>Getting Started</span></a></li>
-			<li><a href="#docs-basic"><span>Basic Usage</span></a></li>
-			<li><a href="#docs-options"><span>Options</span></a></li>
-			<li><a href="#docs-templates"><span>Templates</span></a></li>
-			<li><a href="#docs-route"><span>Routes</span></a></li>
-			<li><a href="#docs-plugins"><span>Plugins</span></a></li>
-			<li><a href="#docs-callbacks"><span>Callbacks</span></a></li>
-			<li><a href="#docs-methods"><span>Methods</span></a></li>
-		</ul>
-	</li>
+	<li><a href="#docs"><span>DOCS</span></a></li>
 	<li><a href="#contribute"><span>CONTRIBUTE</span></a></li>
 	<li><a href="#showcase"><span>SHOWCASE</span></a>
 		<ul>
@@ -117,46 +107,21 @@
 
 	<div id="docs" class="step" style="display:none">
 		<h1>docs</h1>
-		<p id="read-docs" style="display:none">Read them <a href="#docs-start">&lt; over there ;)</a></p>
+		<p id="read-docs" style="display:none">Read the docs <a href="docs/" target="_blank">over here</a>.</p>
 		<span class="ui-icon ui-icon-document"></span>
-		
-		<div id="docs-start" data-src="docs/start.html" class="step docs ui-widget-content" data-x="-1000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-basic" data-src="docs/basic.html" class="step docs ui-widget-content" data-x="-2000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-options" data-src="docs/options.html" class="step docs ui-widget-content" data-x="-3000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-templates" data-src="docs/templates.html" class="step docs ui-widget-content" data-x="-4000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-route" data-src="docs/route.html" class="step docs ui-widget-content" data-x="-5000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-plugins" data-src="docs/plugins.html" class="step docs ui-widget-content" data-x="-6000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-callbacks" data-src="docs/callbacks.html" class="step docs ui-widget-content" data-x="-7000" data-rotate="180">
-			Loading...
-		</div>
-		<div id="docs-methods" data-src="docs/methods.html" class="step docs ui-widget-content" data-x="-8000" data-rotate="180">
-			Loading...
-		</div>
 	</div>
 
 	<div id="contribute" class="step">
 		<h1>contribute</h1>
-		<p>Good news! We accept pull requests ;)</p>
-		<p>Please work and pull against the <i>dev</i> or <i>dev-next</i> branch. Thanks!</p>
-		<p>You can also contribute by writing <a href="https://github.com/shama/jmpress.js/issues" target="_blank">issues</a> for bugs or features requests.</p>
+		<p>Good news! We accept pull requests and would appreciate your
+		contributions! Please <a href="docs/#contribute" target="_blank">click
+		here</a> to learn more on contributing.</p>
 		<span class="ui-icon ui-icon-person"></span>
 	</div>
 
 	<div id="contribute-tests" class="step">
 		<h1>tests</h1>
-		<p>jmpress.js uses the <a href="http://pivotal.github.com/jasmine/" target="_blank">jasmine bdd</a> library for testing. Please load <i>test.html</i> in your browser to run the tests.</p>
+		<p>jmpress.js uses the <a href="http://pivotal.github.com/jasmine/" target="_blank">jasmine bdd</a> library for testing. Please load <i>tests/</i> in your browser to run the tests.</p>
 	</div>
 
 	<div id="contribute-wishlist" class="step">
@@ -174,9 +139,9 @@
 		<h1>some cool features</h1>
 		<ul>
 			<li>custom animation, click next or press arrow key to see it.</li>
-			<li data-jmpress="fade">embed this in a container <a href="container.html">Show Sample</a></li>
+			<li data-jmpress="fade">embed this in a container <a href="examples/container.html">Show Sample</a></li>
 			<li data-jmpress="drive-right">jquery ui themes</li>
-			<li data-jmpress="drive-up">Switch to normal view: <a href="#" id="uninit-jmpress">Switch</a></li>
+			<li data-jmpress="drive-up">Switch to normal view: <a href="#" id="uninit-jmpress">Switch</a> or press Esc</li>
 			<li data-jmpress="warp-right">nice plugin interface <br>(most of the core functionality is built on this interface)</li>
 			<li data-jmpress="fade">many config options</li>
 			<li data-jmpress="drive-right">tree-like hierarchies are possible</li>
@@ -219,7 +184,6 @@
 				<div id="nested-jmpress-bar" class="ui-progressbar-value ui-widget-header ui-corner-left" style="width:0"></div>
 			</div>
 		</div>
-		<p style="font-size: 70%">NOTICE: Nested 3D is buggy in Chrome 16 but fixed in Chrome 17, sorry.</p>
 	</div>
 
 	<div id="showcase-zoom" class="big step">

@@ -1,4 +1,5 @@
 /*global config:true, task:true*/
+require("./.grunt/css_min");
 config.init({
 	pkg: '<json:package.json>',
 	meta: {
@@ -13,53 +14,78 @@ config.init({
 		' * <%= _.pluck(pkg.licenses, "url").join(", ") %>\n' +
 		' *\n' +
 		' * Based on the foundation laid by Bartek Szopka @bartaz\n' +
+		' */',
+		pluginbanner: '/*!\n' +
+		' * plugin for <%= pkg.name || pkg.title %> v<%= pkg.version %>\n' +
+		' *\n' +
+		' * Copyright <%= template.today("yyyy") %> <%= pkg.author.name %>\n' +
+		' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n' +
+		' * <%= _.pluck(pkg.licenses, "url").join(", ") %>\n' +
 		' */'
 	},
 	watch: {
-		files: '<config:lint.files>',
-		tasks: 'concat'
+		files: ['src/**'],
+		tasks: 'default'
 	},
 	lint: {
-		files: ['components/*', 'plugins/*']
+		files: ['src/components/*', 'src/plugins/*']
 	},
 	concat: {
-		'js/jmpress.js': ['<banner>',
-			'components/core.js',
-			'components/near.js',
-			'components/transform.js',
-			'components/active.js',
-			'components/circular.js',
-			'components/start.js',
-			'components/ways.js',
-			'components/ajax.js',
-			'components/hash.js',
-			'components/keyboard.js',
-			'components/viewport.js',
-			'components/mouse.js',
-			'components/templates.js',
-			'components/jqevents.js',
-			'components/animation.js'],
-		'js/jmpress.impress.js': ['<banner>',
-			'components/core.js',
-			'components/near.js',
-			'components/transform.js',
-			'components/active.js',
-			'components/circular.js',
-			'components/hash.js',
-			'components/keyboard.js',
-			'components/mouse.js'],
-		'js/jmpress.demo.js': [
-			'js/jmpress.js',
-			'plugins/jmpress.duration.js',
-			'plugins/jmpress.secondary.js',
-			'plugins/jmpress.toggle.js',
-			'components/demo.js'],
-		'js/jmpress.all.js': ['<banner>', 'js/jmpress.js', 'plugins/*']
+		'dist/jmpress.js': ['<banner>',
+			'src/components/core.js',
+			'src/components/near.js',
+			'src/components/transform.js',
+			'src/components/active.js',
+			'src/components/circular.js',
+			'src/components/start.js',
+			'src/components/ways.js',
+			'src/components/ajax.js',
+			'src/components/hash.js',
+			'src/components/keyboard.js',
+			'src/components/viewport.js',
+			'src/components/mouse.js',
+			'src/components/templates.js',
+			'src/components/jqevents.js',
+			'src/components/animation.js'],
+		'dist/jmpress.impress.js': ['<banner>',
+			'src/components/core.js',
+			'src/components/near.js',
+			'src/components/transform.js',
+			'src/components/active.js',
+			'src/components/circular.js',
+			'src/components/hash.js',
+			'src/components/keyboard.js',
+			'src/components/mouse.js'],
+		'dist/jmpress.allplugins.js': ['<banner:meta.pluginbanner>',
+			'src/plugins/toggle.js',
+			'src/plugins/secondary.js',
+			'src/plugins/duration.js'],
+		'dist/jmpress.demo.js': ['<banner>',
+			'dist/jmpress.js',
+			'dist/jmpress.allplugins.js',
+			'src/components/demo.js'],
+		'dist/jmpress.all.js': ['<banner>',
+			'dist/jmpress.js',
+			'dist/jmpress.allplugins.js'],
+		'dist/plugins/jmpress.secondary.js': ['<banner:meta.pluginbanner>', 'src/plugins/secondary.js'],
+		'dist/plugins/jmpress.toggle.js': ['<banner:meta.pluginbanner>', 'src/plugins/toggle.js'],
+		'dist/plugins/jmpress.duration.js': ['<banner:meta.pluginbanner>', 'src/plugins/duration.js'],
+
+		'dist/basic-animations.css': ['<banner>', 'src/css/animations/basic/*'],
+		'dist/advanced-animations.css': ['<banner>', 'src/css/animations/advanced/*'],
 	},
 	min: {
-		'js/jmpress.min.js': ['<banner>', 'js/jmpress.js'],
-		'js/jmpress.impress.min.js': ['<banner>', 'js/jmpress.impress.js'],
-		'js/jmpress.all.min.js': ['<banner>', 'js/jmpress.all.js'],
+		'dist/jmpress.min.js': ['<banner>', 'dist/jmpress.js'],
+		'dist/jmpress.impress.min.js': ['<banner>', 'dist/jmpress.impress.js'],
+		'dist/jmpress.all.min.js': ['<banner>', 'dist/jmpress.all.js'],
+		'dist/jmpress.allplugins.min.js': ['<banner:meta.pluginbanner>', 'dist/jmpress.allplugins.js'],
+		'dist/plugins/jmpress.secondary.min.js': ['<banner:meta.pluginbanner>', 'dist/plugins/jmpress.secondary.js'],
+		'dist/plugins/jmpress.toggle.min.js': ['<banner:meta.pluginbanner>', 'dist/plugins/jmpress.toggle.js'],
+		'dist/plugins/jmpress.duration.min.js': ['<banner:meta.pluginbanner>', 'dist/plugins/jmpress.duration.js'],
+	},
+	css_min: {
+		'dist/basic-animations.min.css': ['dist/basic-animations.css'],
+		'dist/advanced-animations.min.css': ['dist/advanced-animations.css'],
 	},
 	jshint: {
 		options: {
@@ -82,6 +108,7 @@ config.init({
 			_gaq: true
 		}
 	},
+	sqwish: {},
 	uglify: {}
 });
-task.registerTask('default', 'lint concat min');
+task.registerTask('default', 'lint concat min css_min');
