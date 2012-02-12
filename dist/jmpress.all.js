@@ -102,7 +102,6 @@
 			,transformStyle: "preserve-3d"
 		}
 		,transitionDuration: 1500
-		,maxNestedDepth: 10
 
 		/* TEST */
 		,test: false
@@ -1030,7 +1029,15 @@
 		});
 	});
 	$.jmpress("afterInit", function( nil, eventData ) {
-		eventData.current.perspectiveScale = 1;
+		var stepSelector = eventData.settings.stepSelector,
+			current = eventData.current;
+		current.perspectiveScale = 1;
+		current.maxNestedDepth = 0;
+		var nestedSteps = $(eventData.jmpress).find(stepSelector).children(stepSelector);
+		while(nestedSteps.length) {
+			current.maxNestedDepth++;
+			nestedSteps = nestedSteps.children(stepSelector);
+		}
 	});
 	$.jmpress("applyStep", function( step, eventData ) {
 		$.jmpress("css", $(step), {
@@ -1067,7 +1074,7 @@
 		var tf = target.transform = [];
 		target.perspectiveScale = 1;
 
-		for(var i = eventData.settings.maxNestedDepth; i > (eventData.parents.length || 0); i--) {
+		for(var i = eventData.current.maxNestedDepth; i > (eventData.parents.length || 0); i--) {
 			tf.push(["scale"], ["rotate"], ["translate"]);
 		}
 
@@ -1188,28 +1195,28 @@
 		};
 		props = $.extend({}, animation, props);
 		if (!zoomin) {
-			props.transitionDelay = '0';
+			props.transitionDelay = '0s';
 		}
 		if (!active) {
-			props.transitionDuration = '0';
-			props.transitionDelay = '0';
+			props.transitionDuration = '0s';
+			props.transitionDelay = '0s';
 		}
 		$.jmpress("css", eventData.area, props);
 		engine.transform(eventData.area, extracted);
 
 		props = $.extend({}, animation);
 		if (!zoomout) {
-			props.transitionDelay = '0';
+			props.transitionDelay = '0s';
 		}
 		if (!active) {
-			props.transitionDuration = '0';
-			props.transitionDelay = '0';
+			props.transitionDuration = '0s';
+			props.transitionDelay = '0s';
 		}
 
 		eventData.current.perspectiveScale = target.perspectiveScale;
 
-		engine.transform(eventData.canvas, target.transform);
 		$.jmpress("css", eventData.canvas, props);
+		engine.transform(eventData.canvas, target.transform);
 	});
 
 }(jQuery, document, window));

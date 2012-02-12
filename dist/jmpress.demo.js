@@ -102,7 +102,6 @@
 			,transformStyle: "preserve-3d"
 		}
 		,transitionDuration: 1500
-		,maxNestedDepth: 10
 
 		/* TEST */
 		,test: false
@@ -1030,7 +1029,15 @@
 		});
 	});
 	$.jmpress("afterInit", function( nil, eventData ) {
-		eventData.current.perspectiveScale = 1;
+		var stepSelector = eventData.settings.stepSelector,
+			current = eventData.current;
+		current.perspectiveScale = 1;
+		current.maxNestedDepth = 0;
+		var nestedSteps = $(eventData.jmpress).find(stepSelector).children(stepSelector);
+		while(nestedSteps.length) {
+			current.maxNestedDepth++;
+			nestedSteps = nestedSteps.children(stepSelector);
+		}
 	});
 	$.jmpress("applyStep", function( step, eventData ) {
 		$.jmpress("css", $(step), {
@@ -1067,7 +1074,7 @@
 		var tf = target.transform = [];
 		target.perspectiveScale = 1;
 
-		for(var i = eventData.settings.maxNestedDepth; i > (eventData.parents.length || 0); i--) {
+		for(var i = eventData.current.maxNestedDepth; i > (eventData.parents.length || 0); i--) {
 			tf.push(["scale"], ["rotate"], ["translate"]);
 		}
 
@@ -1188,28 +1195,28 @@
 		};
 		props = $.extend({}, animation, props);
 		if (!zoomin) {
-			props.transitionDelay = '0';
+			props.transitionDelay = '0s';
 		}
 		if (!active) {
-			props.transitionDuration = '0';
-			props.transitionDelay = '0';
+			props.transitionDuration = '0s';
+			props.transitionDelay = '0s';
 		}
 		$.jmpress("css", eventData.area, props);
 		engine.transform(eventData.area, extracted);
 
 		props = $.extend({}, animation);
 		if (!zoomout) {
-			props.transitionDelay = '0';
+			props.transitionDelay = '0s';
 		}
 		if (!active) {
-			props.transitionDuration = '0';
-			props.transitionDelay = '0';
+			props.transitionDuration = '0s';
+			props.transitionDelay = '0s';
 		}
 
 		eventData.current.perspectiveScale = target.perspectiveScale;
 
-		engine.transform(eventData.canvas, target.transform);
 		$.jmpress("css", eventData.canvas, props);
+		engine.transform(eventData.canvas, target.transform);
 	});
 
 }(jQuery, document, window));
@@ -2570,14 +2577,10 @@
 			{
 				x: 2500
 				,y: -900
+				,z: -350
 				,rotate: -160
+				,rotateX: 40
 				,scale: 2.2
-			},
-			{
-				x: 2600
-				,y: -1700
-				,rotate: -180
-				,scale: 2.4
 			},
 			{
 				x: 2600
@@ -2586,25 +2589,11 @@
 				,scale: 2.6
 			},
 			{
-				x: 2700
-				,y: -3700
-				,z: -350
-				,rotate: -230
-				,rotateX: 40
-				,scale: 2.8
-			},
-			{
 				x: 1500
-				,y: -4500
-				,rotate: -230
-				,scale: 2.8
-			},
-			{
-				x: 1500
-				,y: -9000
+				,y: -2600
 				,z: 0
 				,rotate: -230
-				,scale: 10
+				,scale: 0.7
 				,viewPort: {
 					height: 2000
 					,width: 4500
@@ -2614,7 +2603,6 @@
 			}
 		]});
 		$('#jmpress').jmpress("route", ["#showcase-zoom", "#about"]);
-		$('#jmpress').jmpress("route", ["#docs", "#contribute"]);
 		var jmpressConfig = {
 			// SET THE VIEW PORT
 			viewPort: {
