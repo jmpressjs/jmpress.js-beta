@@ -254,6 +254,9 @@
 			});
 
 			container.attr("style", oldStyle.container);
+			if(settings.fullscreen) {
+				$("html").attr("style", "");
+			}
 			area.attr("style", oldStyle.area);
 			$(canvas).children().each(function() {
 				jmpress.append( $( this ) );
@@ -619,6 +622,9 @@
 		});
 		if(settings.fullscreen) {
 			container = $('body');
+			$("html").css({
+				overflow: 'hidden'
+			});
 			area = jmpress;
 		}
 		oldStyle.area = area.attr("style") || "";
@@ -926,8 +932,12 @@
 
 	'use strict';
 
+	/* FUNCTIONS */
 	function randomString() {
 		return "" + Math.round(Math.random() * 100000, 0);
+	}
+	function toCssNumber(number) {
+		return (Math.round(10000*number)/10000)+"";
 	}
 
 	/**
@@ -941,15 +951,15 @@
 					var coord = ["X", "Y", "Z"];
 					var i;
 					if(item[0] === "translate") { // ["translate", x, y, z]
-						transform += " translate3d(" + (item[1] || 0) + "px," + (item[2] || 0) + "px," + (item[3] || 0) + "px)";
+						transform += " translate3d(" + toCssNumber(item[1] || 0) + "px," + toCssNumber(item[2] || 0) + "px," + toCssNumber(item[3] || 0) + "px)";
 					} else if(item[0] === "rotate") {
 						var order = item[4] ? [1, 2, 3] : [3, 2, 1];
 						for(i = 0; i < 3; i++) {
-							transform += " rotate" + coord[order[i]-1] + "(" + (item[order[i]] || 0) + "deg)";
+							transform += " rotate" + coord[order[i]-1] + "(" + toCssNumber(item[order[i]] || 0) + "deg)";
 						}
 					} else if(item[0] === "scale") {
 						for(i = 0; i < 3; i++) {
-							transform += " scale" + coord[i] + "(" + (item[i+1] || 1) + ")";
+							transform += " scale" + coord[i] + "(" + toCssNumber(item[i+1] || 1) + ")";
 						}
 					}
 				});
@@ -962,12 +972,12 @@
 				$.each(data, function(idx, item) {
 					var coord = ["X", "Y"];
 					if(item[0] === "translate") { // ["translate", x, y, z]
-						transform += " translate(" + (item[1] || 0) + "px," + (item[2] || 0) + "px)";
+						transform += " translate(" + toCssNumber(item[1] || 0) + "px," + toCssNumber(item[2] || 0) + "px)";
 					} else if(item[0] === "rotate") {
-						transform += " rotate(" + (item[3] || 0) + "deg)";
+						transform += " rotate(" + toCssNumber(item[3] || 0) + "deg)";
 					} else if(item[0] === "scale") {
 						for(var i = 0; i < 2; i++) {
-							transform += " scale" + coord[i] + "(" + (item[i+1] || 1) + ")";
+							transform += " scale" + coord[i] + "(" + toCssNumber(item[i+1] || 1) + ")";
 						}
 					}
 				});
@@ -983,8 +993,8 @@
 				$.each(data, function(idx, item) {
 					var coord = ["X", "Y"];
 					if(item[0] === "translate") { // ["translate", x, y, z]
-						anitarget.left = (item[1] || 0) + "px";
-						anitarget.top = (item[2] || 0) + "px";
+						anitarget.left = Math.round(item[1] || 0) + "px";
+						anitarget.top = Math.round(item[2] || 0) + "px";
 					}
 				});
 				el.animate(anitarget, 1000); // TODO: Use animation duration
@@ -1870,7 +1880,7 @@
 		eventData.current.zoomOriginWindowScale = windowScale;
 	});
 	$.jmpress("setInactive", function( step, eventData ) {
-		if(eventData.nextStep !== step) {
+		if(!eventData.nextStep || !step || $(eventData.nextStep).attr("id") !== $(step).attr("id")) {
 			eventData.current.userZoom = 0;
 			eventData.current.userTranslateX = 0;
 			eventData.current.userTranslateY = 0;
@@ -1931,6 +1941,57 @@
 
 }(jQuery, document, window));
 /*!
+ * mobile.js
+ * Adds support for swipe on touch supported browsers
+ */
+(function( $, document, window, undefined ) {
+
+	'use strict';
+	var $jmpress = $.jmpress;
+
+	/* FUNCTIONS */
+	function randomString() {
+		return "" + Math.round(Math.random() * 100000, 0);
+	}
+
+	/* HOOKS */
+	$jmpress( 'afterInit', function( step, eventData ) {
+		var settings = eventData.settings,
+			current = eventData.current,
+			jmpress = eventData.jmpress;
+		current.mobileNamespace = ".jmpress-"+randomString();
+		var data, start = [0,0];
+		$(settings.fullscreen ? document : jmpress)
+			.bind("touchstart"+current.mobileNamespace, function( event ) {
+
+			data = event.originalEvent.touches[0];
+			start = [ data.pageX, data.pageY ];
+
+		}).bind("touchmove"+current.mobileNamespace, function( event ) {
+			data = event.originalEvent.touches[0];
+			event.preventDefault();
+			return false;
+		}).bind("touchend"+current.mobileNamespace, function( event ) {
+			var end = [ data.pageX, data.pageY ],
+				diff = [ end[0]-start[0], end[1]-start[1] ];
+
+			if(Math.max(Math.abs(diff[0]), Math.abs(diff[1])) > 50) {
+				diff = Math.abs(diff[0]) > Math.abs(diff[1]) ? diff[0] : diff[1];
+				$(jmpress).jmpress(diff > 0 ? "prev" : "next");
+				event.preventDefault();
+				return false;
+			}
+		});
+	});
+	$jmpress('afterDeinit', function( nil, eventData ) {
+		var settings = eventData.settings,
+			current = eventData.current,
+			jmpress = eventData.jmpress;
+		$(settings.fullscreen ? document : jmpress).unbind(current.mobileNamespace);
+	});
+
+}(jQuery, document, window));
+/*!
  * templates.js
  * The amazing template engine
  */
@@ -1977,7 +2038,7 @@
 			children.each(function(idx, child) {
 				child = $(child);
 				var tmpl = child.data(templateFromParentIdent) || {};
-				addUndefined(tmpl, templateChildren(idx, child));
+				addUndefined(tmpl, templateChildren(idx, child, children));
 				child.data(templateFromParentIdent, tmpl);
 			});
 		} // TODO: else if(object)
@@ -2108,7 +2169,7 @@
 	function parseSubstepInfo(str) {
 		var arr = str.split(" ");
 		var className = arr[0];
-		var config = { willClass: "will-"+className, doClass: className, hasClass: "has-"+className };
+		var config = { willClass: "will-"+className, doClass: "do-"+className, hasClass: "has-"+className };
 		var state = "";
 		for(var i = 1; i < arr.length; i++) {
 			var s = arr[i];
@@ -2121,9 +2182,11 @@
 				}
 				break;
 			case "after":
-				if(s.match(/^[1-9][0-9]*[sm]?/)) {
+				if(s.match(/^[1-9][0-9]*m?s?/)) {
 					var value = parseFloat(s);
-					if(s.indexOf("s") !== -1) {
+					if(s.indexOf("ms") !== -1) {
+						value *= 1;
+					} else if(s.indexOf("s") !== -1) {
 						value *= 1000;
 					} else if(s.indexOf("m") !== -1) {
 						value *= 60000;
@@ -2517,6 +2580,134 @@
 }(jQuery, document, window));
 
 /*!
+ * jmpress.presentation-mode plugin
+ * Display a window for the presentator with notes and a control and view of the
+ * presentation
+ */
+(function( $, document, window, undefined ) {
+
+	'use strict';
+	var $jmpress = $.jmpress;
+
+	/* FUNCTIONS */
+	function randomString() {
+		return "" + Math.round(Math.random() * 100000, 0);
+	}
+
+	/* DEFAULTS */
+	$jmpress("defaults").presentationMode = {
+		use: true,
+		url: "presentation-screen.html",
+		notesUrl: false,
+		transferredValues: ["userZoom", "userTranslateX", "userTranslateY"]
+	};
+	$jmpress("defaults").keyboard.keys[80] = "presentationPopup"; // p key
+
+	/* HOOKS */
+	$jmpress("afterInit", function( nil, eventData) {
+		var current = eventData.current;
+
+		current.selectMessageListeners = [];
+
+		if(eventData.settings.presentationMode.use) {
+
+			window.addEventListener("message", function(event) {
+				// We do not test orgin, because we want to accept messages
+				// from all orgins
+				try {
+					window.console.log(event.data);
+					var json = JSON.parse(event.data);
+					switch(json.type) {
+					case "select":
+						// TODO SECURITY filter targetId
+						$.each(eventData.settings.presentationMode.transferredValues, function(idx, name) {
+							eventData.current[name] = json[name];
+						});
+						$(eventData.jmpress).jmpress("select", {step: "#"+json.targetId, substep: json.substep}, json.reason);
+						break;
+					case "listen":
+						current.selectMessageListeners.push(event.source);
+						break;
+					case "ok":
+						clearTimeout(current.presentationPopupTimeout);
+						break;
+					case "read":
+						try {
+							event.source.postMessage(JSON.stringify({type: "url", url: window.location.href, notesUrl: eventData.settings.presentationMode.notesUrl}), "*");
+						} catch(e) {
+							$.error("Cannot post message to source: " + e);
+						}
+						break;
+					default:
+						throw "Unknown message type: " + json.type;
+					}
+				} catch(e) {
+					$.error("Recieved message is malformed: " + e);
+				}
+			});
+			try {
+				if(window.parent && window.parent !== window) {
+					window.parent.postMessage(JSON.stringify({
+						"type": "afterInit"
+					}), "*");
+				}
+			} catch(e) {
+				$.error("Cannot post message to parent: " + e);
+			}
+		}
+	});
+	$jmpress("afterDeinit", function( nil, eventData) {
+		if(eventData.settings.presentationMode.use) {
+			try {
+				if(window.parent && window.parent !== window) {
+					window.parent.postMessage(JSON.stringify({
+						"type": "afterDeinit"
+					}), "*");
+				}
+			} catch(e) {
+				$.error("Cannot post message to parent: " + e);
+			}
+		}
+	});
+	$jmpress("setActive", function( step, eventData) {
+		var stepId = $(eventData.delegatedFrom).attr("id"),
+			substep = eventData.substep,
+			reason = eventData.reason;
+		$.each(eventData.current.selectMessageListeners, function(idx, listener) {
+			try {
+				var msg = {
+					"type": "select",
+					"targetId": stepId,
+					"substep": substep,
+					"reason": reason
+				};
+				$.each(eventData.settings.presentationMode.transferredValues, function(idx, name) {
+					msg[name] = eventData.current[name];
+				});
+				listener.postMessage(JSON.stringify(msg), "*");
+			} catch(e) {
+				$.error("Cannot post message to listener: " + e);
+			}
+		});
+	});
+	$jmpress("register", "presentationPopup", function() {
+		function trySend() {
+			jmpress.jmpress("current").presentationPopupTimeout = setTimeout(trySend, 100);
+			try {
+				popup.postMessage(JSON.stringify({type: "url", url: window.location.href, notesUrl: jmpress.jmpress("settings").presentationMode.notesUrl}), "*");
+			} catch(e) {
+			}
+		}
+		var jmpress = $(this),
+			popup;
+		if(jmpress.jmpress("settings").presentationMode.use) {
+			popup = window.open($(this).jmpress("settings").presentationMode.url);
+			jmpress.jmpress("current").presentationPopupTimeout = setTimeout(trySend, 100);
+		}
+	});
+}(jQuery, document, window));
+
+/*!
  * demo.js
  * Extras for running the main jmpress.js demo
  */
@@ -2673,6 +2864,7 @@
 			,canvasClass: ""
 			,initClass: "init-css"
 			,notSupportedClass: "normal-mode"
+			,presentationMode: { notesUrl: "index.notes.html" }
 		};
 		$('#jmpress').jmpress("toggle", 27, jmpressConfig, true);
 		$('.next').click(function() {
@@ -2748,6 +2940,7 @@
 			,hash: { use: false }
 			,stepSelector: ".nested-step"
 			,fullscreen: false
+			,presentationMode: { use: false }
 		});
 		setTimeout(function() {
 			$("#jmpress").removeClass("init-css");

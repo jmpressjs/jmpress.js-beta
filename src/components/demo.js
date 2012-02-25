@@ -155,6 +155,7 @@
 			,canvasClass: ""
 			,initClass: "init-css"
 			,notSupportedClass: "normal-mode"
+			,presentationMode: { notesUrl: "index.notes.html" }
 		};
 		$('#jmpress').jmpress("toggle", 27, jmpressConfig, true);
 		$('.next').click(function() {
@@ -230,6 +231,7 @@
 			,hash: { use: false }
 			,stepSelector: ".nested-step"
 			,fullscreen: false
+			,presentationMode: { use: false }
 		});
 		setTimeout(function() {
 			$("#jmpress").removeClass("init-css");
