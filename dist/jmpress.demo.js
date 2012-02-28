@@ -12,19 +12,6 @@
  */
 
 /*!
- * jmpress.js v0.3.5
- * http://shama.github.com/jmpress.js
- *
- * A jQuery plugin to build a website on the infinite canvas.
- *
- * Copyright 2012 Kyle Robinson Young @shama & Tobias Koppers @sokra
- * Licensed MIT
- * http://www.opensource.org/licenses/mit-license.php
- *
- * Based on the foundation laid by Bartek Szopka @bartaz
- */
-
-/*!
  * core.js
  * The core of jmpress.js
  */
@@ -2615,7 +2602,6 @@
 				// We do not test orgin, because we want to accept messages
 				// from all orgins
 				try {
-					window.console.log(event.data);
 					var json = JSON.parse(event.data);
 					switch(json.type) {
 					case "select":
@@ -2778,22 +2764,9 @@
 				,y: -2500
 				,rotate: -210
 				,scale: 2.6
-			},
-			{
-				x: 1500
-				,y: -2600
-				,z: 0
-				,rotate: -230
-				,scale: 0.7
-				,viewPort: {
-					height: 2000
-					,width: 4500
-					,zoomable: 10
-					,maxScale: 2
-				}
 			}
 		]});
-		$('#jmpress').jmpress("route", ["#showcase-zoom", "#about"]);
+		$('#jmpress').jmpress("route", ".step:not(#home)");
 		var jmpressConfig = {
 			// SET THE VIEW PORT
 			viewPort: {
