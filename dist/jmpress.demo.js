@@ -1,5 +1,5 @@
 /*!
- * jmpress.js v0.3.5
+ * jmpress.js v0.4.0
  * http://shama.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
@@ -1823,7 +1823,7 @@
 		$(this).jmpress("reselect", "zoom");
 	});
 	$.jmpress('afterDeinit', function( nil, eventData ) {
-		$(eventData.settings.fullscreen ? document : this).unbind(eventData.current.viewPortNamespace);
+		$(window).unbind(eventData.current.viewPortNamespace);
 	});
 	$.jmpress("setActive", function( step, eventData ) {
 		var viewPort = eventData.settings.viewPort;
@@ -2386,7 +2386,7 @@
 
 }(jQuery, document, window));
 /*!
- * plugin for jmpress.js v0.3.5
+ * plugin for jmpress.js v0.4.0
  *
  * Copyright 2012 Kyle Robinson Young @shama & Tobias Koppers @sokra
  * Licensed MIT
