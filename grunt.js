@@ -167,7 +167,8 @@ module.exports = function(grunt) {
 		webpack: {
 			docs: {
 				src: "docs/lib/index.js",
-				dest: "docs/web.js"
+				dest: "docs/web.js",
+				minimize: true
 			}
 		},
 		jshint: {
