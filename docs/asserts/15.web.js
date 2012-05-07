@@ -1,1 +1,1 @@
-webpackJsonp(15,{46:function(a,b,c){a.exports="<h1>Near</h1><p>This component adds the <code>$(...).near</code> function to jQuery. This function finds the next and previous element in dom which matches a selector.</p>"}})
+webpackJsonp(15,{44:function(a,b,c){a.exports="<h1>Mobile</h1><p>Adds support for swipe on touch supported browsers.</p>"}})

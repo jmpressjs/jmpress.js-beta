@@ -1,1 +1,1 @@
-webpackJsonp(25,{50:function(a,b,c){a.exports="<h1>Plugin: Toggle</h1><p>Bind a key to toggle the de/initialization of jmpress.js. Example:</p><div><pre>$(&quot;#jmpress&quot;).jmpress(&quot;toggle&quot;, 27); // Bind escape key</pre><p></p></div>"}})
+webpackJsonp(25,{51:function(a,b,c){a.exports="<h1>Starting Step</h1><p>This component handles the config option start.</p><h2><code>property</code> start : <code>undefined</code></h2><p>Selector of step to start from. (ex. <code>#home</code>)</p>"}})

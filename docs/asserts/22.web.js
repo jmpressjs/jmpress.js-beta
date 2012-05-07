@@ -1,1 +1,1 @@
-webpackJsonp(22,{44:function(a,b,c){a.exports="<h1>Mobile</h1><p>Adds support for swipe on touch supported browsers.</p>"}})
+webpackJsonp(22,{50:function(a,b,c){a.exports="<h1>Plugin: Toggle</h1><p>Bind a key to toggle the de/initialization of jmpress.js. Example:</p><div><pre>$(&quot;#jmpress&quot;).jmpress(&quot;toggle&quot;, 27); // Bind escape key</pre><p></p></div>"}})
