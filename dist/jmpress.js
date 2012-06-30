@@ -1,5 +1,5 @@
 /*!
- * jmpress.js v0.4.2
+ * jmpress.js v0.4.3
  * http://shama.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
@@ -1737,14 +1737,15 @@
 		eventData.current.userTranslateY = 0;
 		if(eventData.settings.viewPort.zoomBindWheel) {
 			$(eventData.settings.fullscreen ? document : this)
-				.bind("mousewheel"+eventData.current.viewPortNamespace, function( event, delta ) {
-				delta = delta || event.originalEvent.wheelDelta;
+				.bind("mousewheel"+eventData.current.viewPortNamespace+" DOMMouseScroll"+eventData.current.viewPortNamespace, function( event, delta ) {
+				delta = delta || event.originalEvent.wheelDelta || -event.originalEvent.detail /* mozilla */;
 				var direction = (delta / Math.abs(delta));
 				if(direction < 0) {
 					$(eventData.jmpress).jmpress("zoomOut", event.originalEvent.x, event.originalEvent.y);
 				} else if(direction > 0) {
 					$(eventData.jmpress).jmpress("zoomIn", event.originalEvent.x, event.originalEvent.y);
 				}
+				return false;
 			});
 		}
 		if(eventData.settings.viewPort.zoomBindMove) {
