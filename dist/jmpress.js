@@ -402,7 +402,9 @@
 		function scrollFix() {
 			function fix() {
 				if ($(container)[0].tagName === "BODY") {
-					window.scrollTo(0, 0);
+					try {
+						window.scrollTo(0, 0);
+					} catch(e) {}
 				}
 				$(container).scrollTop(0);
 				$(container).scrollLeft(0);
@@ -1869,6 +1871,7 @@
 				windowScale,
 				1]);
 			eventData.target.transform.reverse();
+			eventData.target.perspectiveScale /= windowScale;
 		}
 		eventData.current.zoomOriginWindowScale = windowScale;
 	});
