@@ -1,5 +1,5 @@
 /*!
- * jmpress.js v0.4.3
+ * jmpress.js v0.4.4
  * http://shama.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
@@ -1293,12 +1293,15 @@
 	function randomString() {
 		return "" + Math.round(Math.random() * 100000, 0);
 	}
-	// TODO allow call of route after init
 	function routeFunc( jmpress, route, type ) {
 		for(var i = 0; i < route.length - 1; i++) {
 			var from = route[i];
 			var to = route[i+1];
-			$(from, jmpress).attr('data-' + type, to);
+			if($(jmpress).jmpress("initialized")) {
+				$(from, jmpress).data("stepData")[type] = to;
+			} else {
+				$(from, jmpress).attr('data-' + type, to);
+			}
 		}
 	}
 	function selectPrevOrNext( step, eventData, attr, prev ) {
