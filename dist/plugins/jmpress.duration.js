@@ -31,7 +31,7 @@
 			durationSettings = settings.duration,
 			current = eventData.current;
 		var dur = eventData.stepData.duration || durationSettings.defaultValue;
-		if( dur && dur > 0 ) {
+		if( current.durationTimeout ) {
 			if( durationSettings.barSelector ) {
 				var css = {
 					transitionProperty: durationSettings.barProperty
@@ -53,10 +53,8 @@
 					}
 				});
 			}
-			if(current.durationTimeout) {
-				clearTimeout(current.durationTimeout);
-				current.durationTimeout = undefined;
-			}
+			clearTimeout(current.durationTimeout);
+			delete current.durationTimeout;
 		}
 	});
 	$.jmpress("setActive", function( step, eventData ) {

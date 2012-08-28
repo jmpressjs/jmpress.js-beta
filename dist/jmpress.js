@@ -309,14 +309,6 @@
 				return false;
 			}
 
-			// Sometimes it's possible to trigger focus on first link with some keyboard action.
-			// Browser in such a case tries to scroll the page to make this element visible
-			// (even that body overflow is set to hidden) and it breaks our careful positioning.
-			//
-			// So, as a lousy (and lazy) workaround we will make the page scroll back to the top
-			// whenever slide is selected
-			//
-			// If you are reading this and know any better way to handle it, I'll be glad to hear about it!
 			scrollFix.call(this);
 
 			var step = $(el).data('stepData');
@@ -400,7 +392,7 @@
 		 * This should fix ANY kind of buggy scrolling
 		 */
 		function scrollFix() {
-			function fix() {
+			(function fix() {
 				if ($(container)[0].tagName === "BODY") {
 					try {
 						window.scrollTo(0, 0);
@@ -419,8 +411,7 @@
 				setTimeout(check, 100);
 				setTimeout(check, 200);
 				setTimeout(check, 400);
-			}
-			fix();
+			}());
 		}
 		/**
 		 * Alias for select
@@ -874,9 +865,6 @@
 	'use strict';
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function toCssNumber(number) {
 		return (Math.round(10000*number)/10000)+"";
 	}
@@ -1290,9 +1278,6 @@
 	var $jmpress = $.jmpress;
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function routeFunc( jmpress, route, type ) {
 		for(var i = 0; i < route.length - 1; i++) {
 			var from = route[i];
@@ -2005,9 +1990,6 @@
 	var templates = {};
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function addUndefined( target, values, prefix ) {
 		for( var name in values ) {
 			var targetName = name;
@@ -2157,10 +2139,6 @@
 
 	'use strict';
 
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
-
 	function parseSubstepInfo(str) {
 		var arr = str.split(" ");
 		var className = arr[0];
@@ -2189,6 +2167,7 @@
 					config.delay = value;
 				} else {
 					config.after = Array.prototype.slice.call(arr, i).join(" ");
+					i = arr.length;
 				}
 			}
 		}
@@ -2244,10 +2223,10 @@
 					other = listOfSubsteps[idx-1];
 				} else {
 					var index = find(listOfSubsteps, other, 0, idx - 1);
-					if(index === -1) {
+					if(index === undefined) {
 						index = find(listOfSubsteps, other);
 					}
-					other = (index === -1 || index === idx) ? listOfSubsteps[idx-1] : listOfSubsteps[index];
+					other = (index === undefined || index === idx) ? listOfSubsteps[idx-1] : listOfSubsteps[index];
 				}
 			} else {
 				other = listOfSubsteps[idx-1];
