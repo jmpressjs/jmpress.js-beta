@@ -1,6 +1,6 @@
 /*!
  * jmpress.js v0.4.4
- * http://shama.github.com/jmpress.js
+ * http://jmpressjs.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
  *
@@ -9,9 +9,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  *
  * Based on the foundation laid by Bartek Szopka @bartaz
- */
-
-/*!
+ *//*
  * core.js
  * The core of jmpress.js
  */
@@ -779,7 +777,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * near.js
  * Find steps near each other
  */
@@ -856,7 +854,7 @@
 		return $(array);
 	};
 }(jQuery, document, window));
-/*!
+/*
  * transform.js
  * The engine that powers the transforms or falls back to other methods
  */
@@ -1159,7 +1157,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * active.js
  * Set the active classes on steps
  */
@@ -1206,7 +1204,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * circular.js
  * Repeat from start after end
  */
@@ -1254,7 +1252,7 @@
 		return prevOrNext(this, step, eventData);
 	});
 }(jQuery, document, window));
-/*!
+/*
  * start.js
  * Set the first step to start on
  */
@@ -1268,7 +1266,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ways.js
  * Control the flow of the steps
  */
@@ -1328,7 +1326,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ajax.js
  * Load steps via ajax
  */
@@ -1407,7 +1405,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * hash.js
  * Detect and set the URL hash
  */
@@ -1515,7 +1513,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * keyboard.js
  * Keyboard event mapping and default keyboard actions
  */
@@ -1678,7 +1676,7 @@
 
 
 }(jQuery, document, window));
-/*!
+/*
  * viewport.js
  * Scale to fit a given viewport
  */
@@ -1872,7 +1870,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * mouse.js
  * Clicking to select a step
  */
@@ -1924,7 +1922,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * mobile.js
  * Adds support for swipe on touch supported browsers
  */
@@ -1975,7 +1973,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * templates.js
  * The amazing template engine
  */
@@ -2108,7 +2106,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * jqevents.js
  * Fires jQuery events
  */
@@ -2131,7 +2129,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * animation.js
  * Apply custom animations to steps
  */

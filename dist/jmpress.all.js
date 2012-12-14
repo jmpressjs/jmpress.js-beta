@@ -1,6 +1,6 @@
 /*!
  * jmpress.js v0.4.4
- * http://shama.github.com/jmpress.js
+ * http://jmpressjs.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
  *
@@ -9,11 +9,9 @@
  * http://www.opensource.org/licenses/mit-license.php
  *
  * Based on the foundation laid by Bartek Szopka @bartaz
- */
-
-/*!
+ *//*!
  * jmpress.js v0.4.4
- * http://shama.github.com/jmpress.js
+ * http://jmpressjs.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
  *
@@ -22,9 +20,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  *
  * Based on the foundation laid by Bartek Szopka @bartaz
- */
-
-/*!
+ *//*
  * core.js
  * The core of jmpress.js
  */
@@ -792,7 +788,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * near.js
  * Find steps near each other
  */
@@ -869,7 +865,7 @@
 		return $(array);
 	};
 }(jQuery, document, window));
-/*!
+/*
  * transform.js
  * The engine that powers the transforms or falls back to other methods
  */
@@ -1172,7 +1168,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * active.js
  * Set the active classes on steps
  */
@@ -1219,7 +1215,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * circular.js
  * Repeat from start after end
  */
@@ -1267,7 +1263,7 @@
 		return prevOrNext(this, step, eventData);
 	});
 }(jQuery, document, window));
-/*!
+/*
  * start.js
  * Set the first step to start on
  */
@@ -1281,7 +1277,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ways.js
  * Control the flow of the steps
  */
@@ -1341,7 +1337,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ajax.js
  * Load steps via ajax
  */
@@ -1420,7 +1416,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * hash.js
  * Detect and set the URL hash
  */
@@ -1528,7 +1524,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * keyboard.js
  * Keyboard event mapping and default keyboard actions
  */
@@ -1691,7 +1687,7 @@
 
 
 }(jQuery, document, window));
-/*!
+/*
  * viewport.js
  * Scale to fit a given viewport
  */
@@ -1885,7 +1881,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * mouse.js
  * Clicking to select a step
  */
@@ -1937,7 +1933,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * mobile.js
  * Adds support for swipe on touch supported browsers
  */
@@ -1988,7 +1984,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * templates.js
  * The amazing template engine
  */
@@ -2121,7 +2117,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * jqevents.js
  * Fires jQuery events
  */
@@ -2144,7 +2140,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * animation.js
  * Apply custom animations to steps
  */
@@ -2391,9 +2387,7 @@
  * Copyright 2012 Kyle Robinson Young @shama & Tobias Koppers @sokra
  * Licensed MIT
  * http://www.opensource.org/licenses/mit-license.php
- */
-
-/*!
+ *//*
  * jmpress.toggle plugin
  * For binding a key to toggle de/initialization of jmpress.js.
  */
@@ -2416,7 +2410,7 @@
 	});
 }(jQuery, document, window));
 
-/*!
+/*
  * jmpress.secondary plugin
  * Apply a secondary animation when step is selected.
  */
@@ -2484,7 +2478,7 @@
 	});
 }(jQuery, document, window));
 
-/*!
+/*
  * jmpress.duration plugin
  * For auto advancing steps after a given duration and optionally displaying a
  * progress bar.
@@ -2564,7 +2558,7 @@
 	});
 }(jQuery, document, window));
 
-/*!
+/*
  * jmpress.presentation-mode plugin
  * Display a window for the presenter with notes and a control and view of the
  * presentation
@@ -2573,6 +2567,8 @@
 
 	'use strict';
 	var $jmpress = $.jmpress;
+
+	var PREFIX = "jmpress-presentation-";
 
 	/* FUNCTIONS */
 	function randomString() {
@@ -2600,14 +2596,20 @@
 				// We do not test orgin, because we want to accept messages
 				// from all orgins
 				try {
-					var json = JSON.parse(event.data);
+					if(typeof event.data !== "string" || event.data.indexOf(PREFIX) !== 0) {
+						return;
+					}
+					var json = JSON.parse(event.data.slice(PREFIX.length));
 					switch(json.type) {
 					case "select":
-						// TODO SECURITY filter targetId
 						$.each(eventData.settings.presentationMode.transferredValues, function(idx, name) {
 							eventData.current[name] = json[name];
 						});
-						$(eventData.jmpress).jmpress("select", {step: "#"+json.targetId, substep: json.substep}, json.reason);
+						if(/[a-z0-9\-]+/i.test(json.targetId) && typeof json.substep in {number:1,undefined:1}) {
+							$(eventData.jmpress).jmpress("select", {step: "#"+json.targetId, substep: json.substep}, json.reason);
+						} else {
+							$.error("For security reasons the targetId must match /[a-z0-9\\-]+/i and substep must be a number.");
+						}
 						break;
 					case "listen":
 						current.selectMessageListeners.push(event.source);
@@ -2617,7 +2619,7 @@
 						break;
 					case "read":
 						try {
-							event.source.postMessage(JSON.stringify({type: "url", url: window.location.href, notesUrl: eventData.settings.presentationMode.notesUrl}), "*");
+							event.source.postMessage(PREFIX + JSON.stringify({type: "url", url: window.location.href, notesUrl: eventData.settings.presentationMode.notesUrl}), "*");
 						} catch(e) {
 							$.error("Cannot post message to source: " + e);
 						}
@@ -2631,7 +2633,7 @@
 			});
 			try {
 				if(window.parent && window.parent !== window) {
-					window.parent.postMessage(JSON.stringify({
+					window.parent.postMessage(PREFIX + JSON.stringify({
 						"type": "afterInit"
 					}), "*");
 				}
@@ -2644,7 +2646,7 @@
 		if(eventData.settings.presentationMode.use) {
 			try {
 				if(window.parent && window.parent !== window) {
-					window.parent.postMessage(JSON.stringify({
+					window.parent.postMessage(PREFIX + JSON.stringify({
 						"type": "afterDeinit"
 					}), "*");
 				}
@@ -2668,7 +2670,7 @@
 				$.each(eventData.settings.presentationMode.transferredValues, function(idx, name) {
 					msg[name] = eventData.current[name];
 				});
-				listener.postMessage(JSON.stringify(msg), "*");
+				listener.postMessage(PREFIX + JSON.stringify(msg), "*");
 			} catch(e) {
 				$.error("Cannot post message to listener: " + e);
 			}
@@ -2678,7 +2680,7 @@
 		function trySend() {
 			jmpress.jmpress("current").presentationPopupTimeout = setTimeout(trySend, 100);
 			try {
-				popup.postMessage(JSON.stringify({type: "url", url: window.location.href, notesUrl: jmpress.jmpress("settings").presentationMode.notesUrl}), "*");
+				popup.postMessage(PREFIX + JSON.stringify({type: "url", url: window.location.href, notesUrl: jmpress.jmpress("settings").presentationMode.notesUrl}), "*");
 			} catch(e) {
 			}
 		}

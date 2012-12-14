@@ -4,9 +4,7 @@
  * Copyright 2012 Kyle Robinson Young @shama & Tobias Koppers @sokra
  * Licensed MIT
  * http://www.opensource.org/licenses/mit-license.php
- */
-
-/*!
+ *//*
  * jmpress.secondary plugin
  * Apply a secondary animation when step is selected.
  */
